@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PlantLog — Akıllı Bitki Bakım Rehberi & Sulama Asistanı</title>
+  <meta name="description" content="Evinizdeki bitkiler artık hiç solmasın. 104 tür botanik ansiklopedisi, akıllı sulama hatırlatıcısı, bitki doktoru ve 100% çevrimdışı görsel gelişim günlüğü.">
+  <link rel="icon" type="image/png" href="assets/app_icon.png">
+  <link rel="apple-touch-icon" href="assets/app_icon.png">
+
+  <!-- OpenGraph / Social Meta Tags -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="PlantLog — Akıllı Bitki Bakım Rehberi & Sulama Asistanı">
+  <meta property="og:description" content="104 tür botanik ansiklopedisi, kişiselleştirilmiş sulama hatırlatıcıları, hastalık teşhis doktoru ve 100% gizlilik odaklı ev ormanı günlüğü.">
+  <meta property="og:image" content="assets/app_icon.png">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0A130D;
+      --card-bg: rgba(19, 34, 25, 0.78);
+      --card-border: rgba(82, 183, 136, 0.16);
+      --text-main: #F4F9F5;
+      --text-muted: #8FA799;
+      --accent-emerald: #2D6A4F;
+      --accent-mint: #52B788;
+      --accent-lime: #74C69D;
+      --accent-water: #38BDF8;
+      --accent-amber: #FFB340;
+      --accent-terracotta: #E07A5F;
+      --accent-gradient: linear-gradient(135deg, #74C69D 0%, #52B788 50%, #2D6A4F 100%);
+      --card-gradient: linear-gradient(180deg, rgba(29, 50, 38, 0.6) 0%, rgba(15, 26, 20, 0.85) 100%);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background-color: var(--bg);
+      color: var(--text-main);
+      line-height: 1.6;
+      overflow-x: hidden;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Ambient Lighting */
+    .glow-circle {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(140px);
+      z-index: -1;
+      pointer-events: none;
+    }
+    .glow-1 {
+      width: 650px; height: 650px; top: -200px; left: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(45, 106, 79, 0.25) 0%, rgba(82, 183, 136, 0.10) 50%, transparent 70%);
+    }
+    .glow-2 {
+      width: 520px; height: 520px; bottom: 15%; right: -120px;
+      background: radial-gradient(circle, rgba(82, 183, 136, 0.18) 0%, transparent 70%);
+    }
+    .glow-3 {
+      width: 450px; height: 450px; top: 40%; left: -100px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.12) 0%, transparent 70%);
+    }
+
+    .container { max-width: 1140px; margin: 0 auto; padding: 0 24px; width: 100%; }
+
+    /* Header & Navigation */
+    header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      background: rgba(10, 19, 13, 0.85);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      border-bottom: 1px solid var(--card-border);
+    }
+    .nav-wrapper {
+      height: 74px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 12px; text-decoration: none; color: inherit;
+    }
+    .brand-icon {
+      width: 42px; height: 42px; border-radius: 12px;
+      box-shadow: 0 4px 18px rgba(82, 183, 136, 0.35);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    .brand-name {
+      font-size: 1.3rem; font-weight: 800; letter-spacing: -0.5px;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-links { display: flex; align-items: center; gap: 28px; }
+    .nav-links a {
+      color: var(--text-muted); text-decoration: none; font-weight: 600; font-size: 0.95rem;
+      transition: color 0.2s ease;
+    }
+    .nav-links a:hover { color: var(--accent-mint); }
+
+    .btn-nav {
+      background: var(--accent-emerald);
+      color: #FFFFFF !important;
+      padding: 9px 18px;
+      border-radius: 9999px;
+      font-weight: 700 !important;
+      font-size: 0.9rem !important;
+      box-shadow: 0 4px 14px rgba(45, 106, 79, 0.4);
+      transition: all 0.2s ease;
+    }
+    .btn-nav:hover {
+      background: #357d5e;
+      transform: translateY(-1px);
+    }
+
+    /* Hero Section */
+    .hero {
+      padding-top: 150px; padding-bottom: 80px; text-align: center;
+    }
+    .pill-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 7px 20px; border-radius: 9999px;
+      background: rgba(82, 183, 136, 0.12);
+      border: 1px solid rgba(82, 183, 136, 0.3);
+      color: var(--accent-lime); font-size: 0.88rem; font-weight: 700;
+      margin-bottom: 24px;
+      letter-spacing: 0.3px;
+    }
+    .hero h1 {
+      font-size: clamp(2.3rem, 5.2vw, 4.1rem);
+      font-weight: 900; letter-spacing: -1.6px; line-height: 1.15;
+      max-width: 960px; margin: 0 auto 20px;
+    }
+    .gradient-text {
+      background: var(--accent-gradient);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: clamp(1.05rem, 2vw, 1.25rem);
+      color: var(--text-muted); max-width: 720px; margin: 0 auto 36px;
+      line-height: 1.65;
+    }
+
+    /* CTA Buttons */
+    .cta-group {
+      display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 50px;
+    }
+    .btn-store {
+      display: inline-flex; align-items: center; gap: 12px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      padding: 13px 26px; border-radius: 16px;
+      color: #FFFFFF; text-decoration: none; font-weight: 700;
+      backdrop-filter: blur(10px);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .btn-store:hover {
+      background: rgba(82, 183, 136, 0.2);
+      border-color: var(--accent-mint);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(45, 106, 79, 0.3);
+    }
+    .btn-store svg { width: 24px; height: 24px; fill: currentColor; }
+    .btn-store-text { text-align: left; line-height: 1.2; }
+    .btn-store-text span { display: block; font-size: 0.75rem; color: var(--text-muted); font-weight: 500; }
+    .btn-store-text strong { display: block; font-size: 1.05rem; }
+
+    /* Showcase Card */
+    .showcase-wrapper {
+      max-width: 880px; margin: 0 auto 80px;
+      background: var(--card-gradient);
+      border: 1px solid var(--card-border);
+      border-radius: 28px;
+      padding: 36px 32px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+      position: relative;
+      overflow: hidden;
+    }
+    .showcase-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px;
+    }
+    .mini-card {
+      background: rgba(10, 19, 13, 0.7);
+      border: 1px solid var(--card-border);
+      border-radius: 20px; padding: 22px;
+      display: flex; flex-direction: column; gap: 10px;
+      text-align: left;
+    }
+    .mini-card-icon {
+      font-size: 2.2rem;
+    }
+    .mini-card h4 {
+      font-size: 1.15rem; font-weight: 800; color: #FFFFFF;
+    }
+    .mini-card p {
+      font-size: 0.9rem; color: var(--text-muted); line-height: 1.5;
+    }
+    .badge-tag {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 4px 10px; border-radius: 8px; font-size: 0.78rem; font-weight: 700; width: fit-content;
+    }
+    .tag-water { background: rgba(56, 189, 248, 0.15); color: var(--accent-water); }
+    .tag-pet { background: rgba(82, 183, 136, 0.15); color: var(--accent-mint); }
+    .tag-doctor { background: rgba(255, 179, 64, 0.15); color: var(--accent-amber); }
+
+    /* Stats Section */
+    .stats-bar {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px;
+      padding: 30px; margin: 0 auto 100px;
+      background: rgba(19, 34, 25, 0.6);
+      border: 1px solid var(--card-border);
+      border-radius: 22px;
+      text-align: center;
+    }
+    .stat-item h3 {
+      font-size: 2.4rem; font-weight: 900;
+      background: var(--accent-gradient);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-bottom: 4px;
+    }
+    .stat-item p {
+      font-size: 0.88rem; color: var(--text-muted); font-weight: 600;
+    }
+
+    /* Features Section */
+    .section-title {
+      text-align: center; margin-bottom: 56px;
+    }
+    .section-title span {
+      color: var(--accent-mint); font-weight: 800; font-size: 0.9rem;
+      letter-spacing: 1px; text-transform: uppercase; display: block; margin-bottom: 8px;
+    }
+    .section-title h2 {
+      font-size: clamp(2rem, 3.8vw, 2.8rem);
+      font-weight: 800; letter-spacing: -0.8px;
+    }
+    .section-title p {
+      color: var(--text-muted); max-width: 600px; margin: 12px auto 0; font-size: 1.05rem;
+    }
+
+    .features-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;
+      margin-bottom: 110px;
+    }
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 24px; padding: 32px 28px;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative; overflow: hidden;
+    }
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(82, 183, 136, 0.4);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    }
+    .feature-icon-wrapper {
+      width: 58px; height: 58px; border-radius: 16px;
+      background: rgba(45, 106, 79, 0.25);
+      border: 1px solid rgba(82, 183, 136, 0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.8rem; margin-bottom: 20px;
+    }
+    .feature-card h3 {
+      font-size: 1.3rem; font-weight: 800; margin-bottom: 10px; color: #FFFFFF;
+    }
+    .feature-card p {
+      color: #C3D5CA; font-size: 0.96rem; line-height: 1.6;
+    }
+
+    /* FAQ Section */
+    .faq-section {
+      max-width: 820px; margin: 0 auto 120px;
+    }
+    .faq-item {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 18px; margin-bottom: 16px;
+      padding: 24px 28px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .faq-item:hover {
+      border-color: rgba(82, 183, 136, 0.35);
+    }
+    .faq-question {
+      font-weight: 700; font-size: 1.1rem; color: #FFFFFF;
+      display: flex; justify-content: space-between; align-items: center;
+    }
+    .faq-answer {
+      margin-top: 12px; color: var(--text-muted); font-size: 0.96rem; line-height: 1.65;
+    }
+
+    /* Footer */
+    footer {
+      border-top: 1px solid var(--card-border);
+      padding: 50px 24px;
+      background: rgba(10, 19, 13, 0.95);
+      text-align: center;
+      font-size: 0.92rem;
+      color: var(--text-muted);
+    }
+    .footer-brand {
+      display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 16px;
+    }
+    .footer-brand img { width: 32px; height: 32px; border-radius: 8px; }
+    .footer-links {
+      display: flex; justify-content: center; gap: 24px; margin-bottom: 20px; flex-wrap: wrap;
+    }
+    .footer-links a {
+      color: var(--text-muted); text-decoration: none; font-weight: 600;
+      transition: color 0.2s;
+    }
+    .footer-links a:hover { color: var(--accent-mint); }
+
+    @media (max-width: 768px) {
+      .stats-bar { grid-template-columns: repeat(2, 1fr); gap: 18px; }
+      .nav-links { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="glow-circle glow-1"></div>
+  <div class="glow-circle glow-2"></div>
+  <div class="glow-circle glow-3"></div>
+
+  <!-- Header -->
+  <header>
+    <div class="container nav-wrapper">
+      <a href="index.html" class="brand">
+        <img src="assets/app_icon.png" alt="PlantLog Logo" class="brand-icon">
+        <span class="brand-name">PlantLog</span>
+      </a>
+      <nav class="nav-links">
+        <a href="#features">Özellikler</a>
+        <a href="#ansiklopedi">104 Tür Rehberi</a>
+        <a href="#doktor">Bitki Doktoru</a>
+        <a href="#faq">SSS</a>
+        <a href="privacy.html">Gizlilik Politikası</a>
+        <a href="#download" class="btn-nav">Uygulamayı Keşfet</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="container">
+      <div class="pill-badge">
+        <span>🌿</span> Akıllı Ev Bitkisi Rehberi & Sulama Asistanı
+      </div>
+      <h1>
+        Bitkileriniz Artık Asla Solmasın.<br>
+        <span class="gradient-text">Evinizdeki Yeşili Sevgiyle Büyütün.</span>
+      </h1>
+      <p>
+        Monstera'dan Paşa Kılıcı'na 104 iç mekan türü, mevsime duyarlı akıllı sulama sayaçları, yapay zeka destekli hastalık teşhisi ve 100% cihazında saklanan gizlilik odaklı bitki günlüğü.
+      </p>
+
+      <!-- Store Badges -->
+      <div class="cta-group" id="download">
+        <a href="https://apps.apple.com" class="btn-store" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.37c.62-.75 1.04-1.8 0.92-2.85-.9.04-1.99.6-2.63 1.35-.57.65-1.06 1.72-.93 2.75 1 .08 2.02-.5 2.64-1.25z"/></svg>
+          <div class="btn-store-text">
+            <span>App Store'dan İndir</span>
+            <strong>iOS İçin Hazır</strong>
+          </div>
+        </a>
+
+        <a href="https://play.google.com" class="btn-store" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24"><path d="M3.609 1.814L13.793 12 3.61 22.186c-.36-.264-.61-.7-.61-1.222V3.036c0-.522.25-.958.609-1.222zm11.254 11.254L17.5 10.43l-4.14-2.39-2.633 2.633 4.136 2.395zm-3.66-3.66L3.987 2.052l9.88 5.703-2.664 1.653zm0 5.184l2.664 1.653-9.88 5.703 7.216-7.356z"/></svg>
+          <div class="btn-store-text">
+            <span>Google Play'den İndir</span>
+            <strong>Android İçin Hazır</strong>
+          </div>
+        </a>
+      </div>
+
+      <!-- App Showcase Preview -->
+      <div class="showcase-wrapper">
+        <div class="showcase-grid">
+          <div class="mini-card">
+            <span class="mini-card-icon">🪴</span>
+            <span class="badge-tag tag-water">💧 2 Gün Kaldı</span>
+            <h4>Monstera Deliciosa</h4>
+            <p>Salon köşe sehpası • Seramik saksı • Haftada 1 sulama</p>
+          </div>
+          <div class="mini-card">
+            <span class="mini-card-icon">🩺</span>
+            <span class="badge-tag tag-doctor">🩺 Yaprak Sararması</span>
+            <h4>Bitki Doktoru</h4>
+            <p>Aşırı sulama belirtisi tespit edildi. Toprak kuruyana kadar bekleyin.</p>
+          </div>
+          <div class="mini-card">
+            <span class="mini-card-icon">🐾</span>
+            <span class="badge-tag tag-pet">🐱 Kedi & Köpek Dostu</span>
+            <h4>Paşa Kılıcı (Sansevieria)</h4>
+            <p>Hava temizleyici özellik. Evcil hayvanlardan yüksek raflara konumlandırın.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stats Bar -->
+      <div class="stats-bar">
+        <div class="stat-item">
+          <h3>104+</h3>
+          <p>Botanik Bitki Türü</p>
+        </div>
+        <div class="stat-item">
+          <h3>25+</h3>
+          <p>Hastalık & Tedavi Rehberi</p>
+        </div>
+        <div class="stat-item">
+          <h3>100%</h3>
+          <p>Cihazda Yerel Saklama</p>
+        </div>
+        <div class="stat-item">
+          <h3>0</h3>
+          <p>Hesap / Kayıt Zorunluluğu</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core Features Section -->
+  <section class="container" id="features">
+    <div class="section-title">
+      <span>Kapsamlı Bitki Asistanı</span>
+      <h2>Bitkilerinizi Yaşatmak İçin Tasarlandı</h2>
+      <p>Karmaşık botanik jargonunu bir kenara bıraktık. Her yaprağın ihtiyacını cebinize sığdırdık.</p>
+    </div>
+
+    <div class="features-grid">
+      <!-- Feature 1 -->
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">🌿</div>
+        <h3>Evdeki Yeşil Ormanım</h3>
+        <p>
+          Tüm ev bitkilerinizi Salon, Balkon, Çalışma Odası veya Yatak Odası gibi mekanlara göre kategorize edin. Özel isimler verin ve saksı tiplerini takip edin.
+        </p>
+      </div>
+
+      <!-- Feature 2 -->
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">💧</div>
+        <h3>Akıllı Sulama & Bakım Takvimi</h3>
+        <p>
+          Yaz ve kış aylarına göre dinamik olarak hesaplanan sulama sayaçları. Günü gelen bitkiler kırmızıyla uyarır, tek dokunuşla "Şimdi Suladım" diyerek günlüğe işleyin.
+        </p>
+      </div>
+
+      <!-- Feature 3 -->
+      <div class="feature-card" id="ansiklopedi">
+        <div class="feature-icon-wrapper">📖</div>
+        <h3>104 Tür Kapsamlı Ansiklopedi</h3>
+        <p>
+          Işık ihtiyacı, ideal sıcaklık, nem oranı, toprak cinsi ve yaprak çoğaltma yöntemleri. Türkiye'de en çok bakılan popüler ve nadir türlerin tamamı elinizin altında.
+        </p>
+      </div>
+
+      <!-- Feature 4 -->
+      <div class="feature-card" id="doktor">
+        <div class="feature-icon-wrapper">🩺</div>
+        <h3>Yapay Zeka Destekli Bitki Doktoru</h3>
+        <p>
+          Sararan yapraklar, kahverengi lekeler, kök çürümesi veya unlu bit gibi 25'ten fazla bitki hastalığını belirtilerine göre teşhis edin ve adım adım tedavi reçetesini uygulayın.
+        </p>
+      </div>
+
+      <!-- Feature 5 -->
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">🐾</div>
+        <h3>Evcil Hayvan Zehirlilik Uyarısı</h3>
+        <p>
+          Evinde kedi veya köpek besleyen bitki severler için hayati rehber! Hangi bitkinin toksik olduğunu, hangisinin pati dostu olduğunu tek bakışta öğrenin.
+        </p>
+      </div>
+
+      <!-- Feature 6 -->
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">📸</div>
+        <h3>Görsel Gelişim Günlüğü</h3>
+        <p>
+          Kameranızla bitkilerinizin fotoğrafını çekin veya galeriden yükleyin. Aylar içindeki serpilme ve yeni yaprak verme sürecini tam ekran galeriyle izleyin.
+        </p>
+      </div>
+
+      <!-- Feature 7 -->
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">⏰</div>
+        <h3>Zamanında Bildirimler</h3>
+        <p>
+          Asla bitkinizi susuz bırakmayın. Tercih ettiğiniz saatte (sabah veya akşam) telefonunuza düşen nazik sulama hatırlatıcılarıyla kontrol daima sizde olsun.
+        </p>
+      </div>
+
+      <!-- Feature 8 -->
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">🔒</div>
+        <h3>100% Çevrimdışı & Gizlilik</h3>
+        <p>
+          Hesap açmak, e-posta vermek veya şifre girmek yok. Bitki fotoğraflarınız ve notlarınız asla harici bir bulut sunucusuna gitmez; yalnızca kendi telefonunuzda yaşar.
+        </p>
+      </div>
+
+      <!-- Feature 9 -->
+      <div class="feature-card">
+        <div class="feature-icon-wrapper">💨</div>
+        <h3>Hızlı Bakım Kısayolları</h3>
+        <p>
+          Yalnızca su değil; besin verme (gübreleme), yaprak fısfıslama, budama ve saksı değişimi gibi tüm botanik bakım adımlarını saniyeler içinde kaydedin.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="container faq-section" id="faq">
+    <div class="section-title">
+      <span>Merak Edilenler</span>
+      <h2>Sıkça Sorulan Sorular</h2>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>PlantLog'u kullanmak için internet bağlantısı gerekir mi?</span>
+        <span>▼</span>
+      </div>
+      <div class="faq-answer">
+        Hayır. 104 tür botanik ansiklopedisi, sulama sayaçları ve bitki doktoru çevrimdışı (offline) olarak telefonunuzun hafızasında çalışır. İnternetiniz olmasa bile tüm verilere erişebilirsiniz.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>Bitkilerimin fotoğrafları güvende mi?</span>
+        <span>▼</span>
+      </div>
+      <div class="faq-answer">
+        Evet, 100% güvendedir. Çektiğiniz veya galerinizden seçtiğiniz fotoğraflar doğrudan telefonunuzun yerel depolama alanına kaydedilir. Hiçbir sunucuya ya da bulut platformuna aktarılmaz.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>Sulama saatlerini değiştirebilir miyim?</span>
+        <span>▼</span>
+      </div>
+      <div class="faq-answer">
+        Elbette! Ayarlar sekmesinden bildirimlerin sabah mı yoksa akşam mı gelmesini istediğinizi ve tam saatini kolayca belirleyebilirsiniz.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">
+        <span>Evcil hayvanım için güvenli bitkileri nasıl filtreleyebilirim?</span>
+        <span>▼</span>
+      </div>
+      <div class="faq-answer">
+        Rehber sekmesinde "Pati Dostu" filtresini seçerek kedi ve köpekler için tamamen zararsız olan bitkileri tek dokunuşla listeleyebilirsiniz.
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="container">
+      <div class="footer-brand">
+        <img src="assets/app_icon.png" alt="PlantLog Icon">
+        <span class="brand-name">PlantLog</span>
+      </div>
+      <div class="footer-links">
+        <a href="#features">Özellikler</a>
+        <a href="#ansiklopedi">Rehber</a>
+        <a href="#doktor">Bitki Doktoru</a>
+        <a href="privacy.html">Gizlilik Politikası (Privacy Policy)</a>
+        <a href="mailto:support@plantlogapp.com">İletişim & Destek</a>
+      </div>
+      <p>&copy; 2026 PlantLog • Developed by ProgrammerCrow. Tüm hakları saklıdır.</p>
+    </div>
+  </footer>
+
+</body>
+</html>
+
